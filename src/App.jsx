@@ -1,14 +1,17 @@
 import React, { useState } from "react";
+import { SiTicktick } from "react-icons/si";
+import { TiDeleteOutline } from "react-icons/ti";
 
 const App = () => {
   const [date, setDate] = useState(null);
   const [toggleButtonColor, setTtoggleButtonColor] = useState(false);
+
   return (
     <>
-      <h1 className="text-5xl text-center text-white font-semibold py-8">
+      <h1 className="text-3xl sm:text-5xl text-center text-white font-semibold py-8">
         My Task Tracker
       </h1>
-      <div className="sm:h-96 sm:w-2/5 p-8 mx-2 sm:mx-auto bg-gray-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-20">
+      <div className="sm:w-2/4 p-4 sm:p-8 m-4 sm:mx-auto bg-gray-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-20">
         <form className="flex flex-col gap-4 ">
           <input
             className="p-2 rounded-lg text-lg"
@@ -39,8 +42,14 @@ const App = () => {
             Completed
           </button>
         </div>
-        <div>
-          <p>Task 1</p>
+        <div className="">
+          <div className="flex justify-between bg-gray-500 p-4 items-center">
+            <p className="text-white text-lg pb-2">Task 1 sgdgsdv gsdhgshd dgshdgbsd shgdhsgf</p>
+            <span className="flex gap-4 items-center">
+              <TiDeleteOutline className="text-red-500 w-8 h-8 hover:opacity-85 cursor-pointer"/>
+              <SiTicktick className="text-green-500 w-6 h-6 hover:opacity-85 cursor-pointer"/>
+            </span>
+          </div>
         </div>
       </div>
     </>
