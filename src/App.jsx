@@ -4,7 +4,7 @@ const App = () => {
   const [date, setDate] = useState(null);
   return (
     <>
-      <h1 className="text-3xl text-center text-white font-semibold py-8">
+      <h1 className="text-5xl text-center text-white font-semibold py-8">
         My Task Tracker
       </h1>
       <div className="sm:h-96 sm:w-2/5 p-8 mx-2 sm:mx-auto bg-gray-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-20">
