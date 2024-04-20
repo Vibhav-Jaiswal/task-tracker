@@ -13,7 +13,19 @@ const App = () => {
     const updatedTaskList = [...taskList];
     updatedTaskList.push(task);
     setTaskList(updatedTaskList);
+    localStorage.setItem("list", JSON.stringify(updatedTaskList));
   };
+
+  const handleDelete = (idx) => {
+     const newlist = taskList.filter((item) => item !== taskList[idx]);
+     localStorage.setItem('list',newlist);
+     setTaskList(newlist);
+  };
+
+  useEffect(() => {
+    let savedList = JSON.parse(localStorage.getItem("list"));
+    if (savedList) setTaskList(savedList);
+  }, []);
 
   return (
     <>
@@ -58,7 +70,10 @@ const App = () => {
                   <p className="text-white text-sm ">{item.date}</p>
                 </span>
                 <span className="flex gap-4 items-center">
-                  <TiDeleteOutline className="text-red-500 w-8 h-8 hover:opacity-85 cursor-pointer" />
+                  <TiDeleteOutline
+                    className="text-red-500 w-8 h-8 hover:opacity-85 cursor-pointer"
+                    onClick={() => handleDelete(i)}
+                  />
                   <SiTicktick className="text-green-500 w-6 h-6 hover:opacity-85 cursor-pointer" />
                 </span>
               </div>
