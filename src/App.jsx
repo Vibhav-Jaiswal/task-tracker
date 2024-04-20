@@ -3,28 +3,64 @@ import { SiTicktick } from "react-icons/si";
 import { TiDeleteOutline } from "react-icons/ti";
 
 const App = () => {
-  const [date, setDate] = useState(null);
-  const [taskList, setTaskList] = useState([]);
+  const [toggleButtonColor, setTtoggleButtonColor] = useState(false);
   const [newTask, setNewTask] = useState("");
+  const [taskList, setTaskList] = useState([]);
+  const [completedList, setCompletedList] = useState([]);
+  const [screen, setScreen] = useState({
+    incomplete: true,
+    completed: false,
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const task = newTask;
-    const updatedTaskList = [...taskList];
-    updatedTaskList.push(task);
+    const task = {
+      task : newTask,
+      taskAddDate: new Date().toLocaleDateString(),
+    };
+    const updatedTaskList = [...taskList, task];
     setTaskList(updatedTaskList);
     localStorage.setItem("list", JSON.stringify(updatedTaskList));
   };
 
   const handleDelete = (idx) => {
-     const newlist = taskList.filter((item) => item !== taskList[idx]);
-     localStorage.setItem('list',newlist);
-     setTaskList(newlist);
+    const newlist = taskList.filter((item) => item !== taskList[idx]);
+    localStorage.setItem("list", JSON.stringify(newlist));
+    setTaskList(newlist);
+  };
+
+  const handleCompleted = (idx) => {
+    const newCompletedTask = {
+      task:taskList[idx],
+      taskCompletedDate: new Date().toLocaleDateString(),
+    };
+    const savedCompletedList =
+      JSON.parse(localStorage.getItem("completedList")) || [];
+    const newCompletedList = [...savedCompletedList, newCompletedTask];
+    localStorage.setItem("completedList", JSON.stringify(newCompletedList));
+    handleDelete(idx);
+    setCompletedList(newCompletedList);
+  };
+
+  const handleCompletedDelete = (idx) => {
+    const newCompletedList = completedList.filter(
+      (item) => item !== completedList[idx]
+    );
+    localStorage.setItem("completedList", JSON.stringify(newCompletedList));
+    setCompletedList(newCompletedList);
   };
 
   useEffect(() => {
-    let savedList = JSON.parse(localStorage.getItem("list"));
-    if (savedList) setTaskList(savedList);
+    let savedList = localStorage.getItem("list");
+    let savedCompletedList = localStorage.getItem("completedList");
+    if (savedList || savedCompletedList) {
+      try {
+        setTaskList(JSON.parse(savedList));
+        setCompletedList(JSON.parse(savedCompletedList));
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
   }, []);
 
   return (
@@ -41,40 +77,80 @@ const App = () => {
             required
             onChange={(e) => setNewTask(e.target.value)}
           />
-          <input
-            className="p-2 rounded-lg text-lg"
-            type="date"
-            required
-            onChange={(e) => setDate(e.target.value)}
-          />
           <button className="bg-green-500 py-2 rounded-lg text-lg text-white font-bold hover:opacity-85">
             Add Task
           </button>
         </form>
         <div className="flex border-t-2 border-gray-500 my-8 pt-8">
-          <select className="py-2 px-3 sm:px-6 rounded-lg text-lg font-bold hover:opacity-85">
-            <option value="All">All</option>
-            <option value="completed">Completed</option>
-            <option value="incomplete">Incomplete</option>
-          </select>
+          <button
+            className={`${
+              toggleButtonColor ? "bg-gray-500" : "bg-green-500"
+            } py-2 px-2 sm:px-5 rounded-l-lg text-lg text-white font-bold hover:opacity-85`}
+            onClick={() => {
+              setTtoggleButtonColor(false);
+              setScreen({
+                incomplete: true,
+                completed: false,
+              });
+            }}
+          >
+            Incomplete
+          </button>
+          <button
+            className={`${
+              toggleButtonColor ? "bg-green-500 " : "bg-gray-500"
+            } py-2 px-2 sm:px-5 rounded-r-lg text-lg text-white font-bold hover:opacity-85`}
+            onClick={() => {
+              setTtoggleButtonColor(true);
+              setScreen({
+                incomplete: false,
+                completed: true,
+              });
+            }}
+          >
+            Completed
+          </button>
         </div>
         <div>
           {taskList.length > 0 &&
+            screen.incomplete &&
             taskList.map((item, i) => (
               <div
                 className="flex justify-between bg-gray-500 p-4 items-center mb-4"
                 key={i}
               >
                 <span>
-                  <p className="text-white text-lg pb-2">{item}</p>
-                  <p className="text-white text-sm ">{item.date}</p>
+                  <p className="text-white text-lg pb-2">{item.task}</p>
+                  <p className="text-white text-sm ">{item.taskAddDate}</p>
                 </span>
-                <span className="flex gap-4 items-center">
+                <span className="flex flex-col sm:flex-row gap-4 items-center">
                   <TiDeleteOutline
                     className="text-red-500 w-8 h-8 hover:opacity-85 cursor-pointer"
                     onClick={() => handleDelete(i)}
                   />
-                  <SiTicktick className="text-green-500 w-6 h-6 hover:opacity-85 cursor-pointer" />
+                  <SiTicktick
+                    className="text-green-500 w-6 h-6 hover:opacity-85 cursor-pointer"
+                    onClick={() => handleCompleted(i)}
+                  />
+                </span>
+              </div>
+            ))}
+          {completedList.length > 0 &&
+            screen.completed &&
+            completedList.map((item, i) => (
+              <div
+                className="flex justify-between bg-gray-500 p-4 items-center mb-4"
+                key={i}
+              >
+                <span>
+                  <p className="text-white text-lg pb-2">{item.task.task}</p>
+                  <p className="text-white text-sm ">{`${item.task.taskAddDate} - ${item.taskCompletedDate}`}</p>
+                </span>
+                <span className="flex gap-4 items-center">
+                  <TiDeleteOutline
+                    className="text-red-500 w-8 h-8 hover:opacity-85 cursor-pointer"
+                    onClick={() => handleCompletedDelete(i)}
+                  />
                 </span>
               </div>
             ))}
