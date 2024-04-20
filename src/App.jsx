@@ -1,10 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SiTicktick } from "react-icons/si";
 import { TiDeleteOutline } from "react-icons/ti";
 
 const App = () => {
   const [date, setDate] = useState(null);
-  const [toggleButtonColor, setTtoggleButtonColor] = useState(false);
+  const [taskList, setTaskList] = useState([]);
+  const [newTask, setNewTask] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const task = newTask;
+    const updatedTaskList = [...taskList];
+    updatedTaskList.push(task);
+    setTaskList(updatedTaskList);
+  };
 
   return (
     <>
@@ -12,44 +21,48 @@ const App = () => {
         My Task Tracker
       </h1>
       <div className="sm:w-2/4 p-4 sm:p-8 m-4 sm:mx-auto bg-gray-400 rounded-md bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-20">
-        <form className="flex flex-col gap-4 ">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 ">
           <input
             className="p-2 rounded-lg text-lg"
             type="text"
             placeholder="Enter Your Task"
             required
+            onChange={(e) => setNewTask(e.target.value)}
           />
-          <input className="p-2 rounded-lg text-lg" type="date" required />
+          <input
+            className="p-2 rounded-lg text-lg"
+            type="date"
+            required
+            onChange={(e) => setDate(e.target.value)}
+          />
           <button className="bg-green-500 py-2 rounded-lg text-lg text-white font-bold hover:opacity-85">
             Add Task
           </button>
         </form>
         <div className="flex border-t-2 border-gray-500 my-8 pt-8">
-          <button
-            className={`${
-              toggleButtonColor ? "bg-gray-500" : "bg-green-500"
-            } py-2 px-2 sm:px-5 rounded-l-lg text-lg text-white font-bold hover:opacity-85`}
-            onClick={() => setTtoggleButtonColor(false)}
-          >
-            Incomplete
-          </button>
-          <button
-            className={`${
-              toggleButtonColor ? "bg-green-500 " : "bg-gray-500"
-            } py-2 px-2 sm:px-5 rounded-r-lg text-lg text-white font-bold hover:opacity-85`}
-            onClick={() => setTtoggleButtonColor(true)}
-          >
-            Completed
-          </button>
+          <select className="py-2 px-3 sm:px-6 rounded-lg text-lg font-bold hover:opacity-85">
+            <option value="All">All</option>
+            <option value="completed">Completed</option>
+            <option value="incomplete">Incomplete</option>
+          </select>
         </div>
-        <div className="">
-          <div className="flex justify-between bg-gray-500 p-4 items-center">
-            <p className="text-white text-lg pb-2">Task 1 sgdgsdv gsdhgshd dgshdgbsd shgdhsgf</p>
-            <span className="flex gap-4 items-center">
-              <TiDeleteOutline className="text-red-500 w-8 h-8 hover:opacity-85 cursor-pointer"/>
-              <SiTicktick className="text-green-500 w-6 h-6 hover:opacity-85 cursor-pointer"/>
-            </span>
-          </div>
+        <div>
+          {taskList.length > 0 &&
+            taskList.map((item, i) => (
+              <div
+                className="flex justify-between bg-gray-500 p-4 items-center mb-4"
+                key={i}
+              >
+                <span>
+                  <p className="text-white text-lg pb-2">{item}</p>
+                  <p className="text-white text-sm ">{item.date}</p>
+                </span>
+                <span className="flex gap-4 items-center">
+                  <TiDeleteOutline className="text-red-500 w-8 h-8 hover:opacity-85 cursor-pointer" />
+                  <SiTicktick className="text-green-500 w-6 h-6 hover:opacity-85 cursor-pointer" />
+                </span>
+              </div>
+            ))}
         </div>
       </div>
     </>
