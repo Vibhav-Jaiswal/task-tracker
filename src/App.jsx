@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SiTicktick } from "react-icons/si";
 import { TiDeleteOutline } from "react-icons/ti";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
@@ -14,6 +14,19 @@ const App = () => {
   });
   const [idx, setIdx] = useState(1);
 
+  // Function to handle tab switch
+  const handleTabSwitch = (isCompletedTab) => {
+    if (isCompletedTab) {
+      setScreen({ incomplete: false, completed: true });
+      setTtoggleButtonColor(true)
+    } else {
+      setScreen({ incomplete: true, completed: false });
+      setTtoggleButtonColor(false);
+      window.location.reload();
+    }
+  };
+
+  // Function to handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     const task = {
@@ -28,25 +41,26 @@ const App = () => {
     setNewTask("");
   };
 
+  // Function to handle task deletion
   const handleDelete = (idx) => {
     const newlist = taskList.filter((item) => item !== taskList[idx]);
     localStorage.setItem("list", JSON.stringify(newlist));
     setTaskList(newlist);
   };
 
+  // Function to handle task completion
   const handleCompleted = (idx) => {
     const newCompletedTask = {
       ...taskList[idx],
       taskCompletedDate: new Date().toLocaleDateString(),
     };
-    const savedCompletedList =
-      JSON.parse(localStorage.getItem("completedList")) || [];
-    const newCompletedList = [...savedCompletedList, newCompletedTask];
+    const newCompletedList = [...completedList, newCompletedTask];
     localStorage.setItem("completedList", JSON.stringify(newCompletedList));
     handleDelete(idx);
     setCompletedList(newCompletedList);
   };
 
+  // Function to handle completed task deletion
   const handleCompletedDelete = (idx) => {
     const newCompletedList = completedList.filter(
       (item) => item !== completedList[idx]
@@ -55,6 +69,7 @@ const App = () => {
     setCompletedList(newCompletedList);
   };
 
+  // Function to handle task reordering
   const handleDragEnd = (e) => {
     if (!e.destination) return;
     const updatedTasksList = [...taskList];
@@ -65,17 +80,13 @@ const App = () => {
     localStorage.setItem("list", JSON.stringify(updatedTasksList));
   };
 
+  // Initialize task list from localStorage on component mount
   useEffect(() => {
-    let savedList = localStorage.getItem("list");
-    let savedCompletedList = localStorage.getItem("completedList");
-    if (savedList || savedCompletedList) {
-      try {
-        setTaskList(JSON.parse(savedList));
-        setCompletedList(JSON.parse(savedCompletedList));
-      } catch (error) {
-        console.log(error.message);
-      }
-    }
+    const savedTaskList = JSON.parse(localStorage.getItem("list")) || [];
+    const savedCompletedList =
+      JSON.parse(localStorage.getItem("completedList")) || [];
+    setTaskList(savedTaskList);
+    setCompletedList(savedCompletedList);
   }, []);
 
   return (
@@ -102,13 +113,7 @@ const App = () => {
             className={`${
               toggleButtonColor ? "bg-gray-500" : "bg-green-500"
             } py-2 px-2 sm:px-5 rounded-l-lg text-lg text-white font-bold hover:opacity-85`}
-            onClick={() => {
-              setTtoggleButtonColor(false);
-              setScreen({
-                incomplete: true,
-                completed: false,
-              });
-            }}
+            onClick={() => handleTabSwitch(false)}
           >
             Incomplete
           </button>
@@ -116,13 +121,7 @@ const App = () => {
             className={`${
               toggleButtonColor ? "bg-green-500 " : "bg-gray-500"
             } py-2 px-2 sm:px-5 rounded-r-lg text-lg text-white font-bold hover:opacity-85`}
-            onClick={() => {
-              setTtoggleButtonColor(true);
-              setScreen({
-                incomplete: false,
-                completed: true,
-              });
-            }}
+            onClick={() => handleTabSwitch(true)}
           >
             Completed
           </button>
