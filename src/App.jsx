@@ -25,6 +25,7 @@ const App = () => {
     const updatedTaskList = [...taskList, task];
     setTaskList(updatedTaskList);
     localStorage.setItem("list", JSON.stringify(updatedTaskList));
+    setNewTask("");
   };
 
   const handleDelete = (idx) => {
@@ -35,7 +36,7 @@ const App = () => {
 
   const handleCompleted = (idx) => {
     const newCompletedTask = {
-      task: taskList[idx],
+      ...taskList[idx],
       taskCompletedDate: new Date().toLocaleDateString(),
     };
     const savedCompletedList =
@@ -89,6 +90,7 @@ const App = () => {
             type="text"
             placeholder="Enter Your Task"
             required
+            value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
           />
           <button className="bg-green-500 py-2 rounded-lg text-lg text-white font-bold hover:opacity-85">
@@ -182,8 +184,8 @@ const App = () => {
                 key={i}
               >
                 <span>
-                  <p className="text-white text-lg pb-2">{item.task.task}</p>
-                  <p className="text-white text-sm ">{`${item.task.taskAddDate} - ${item.taskCompletedDate}`}</p>
+                  <p className="text-white text-lg pb-2">{item.task}</p>
+                  <p className="text-white text-sm ">{`${item.taskAddDate} - ${item.taskCompletedDate}`}</p>
                 </span>
                 <span className="flex gap-4 items-center">
                   <TiDeleteOutline
