@@ -142,7 +142,7 @@ const App = () => {
                         >
                           {(provided) => (
                             <div
-                              className="flex justify-between bg-gray-500 p-4 items-center mb-4"
+                              className="flex justify-between bg-gray-500 p-4 items-center mb-4 rounded-lg shadow-inner"
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
@@ -180,7 +180,7 @@ const App = () => {
             screen.completed &&
             completedList.map((item, i) => (
               <div
-                className="flex justify-between bg-gray-500 p-4 items-center mb-4"
+                className="flex justify-between bg-gray-500 p-4 items-center mb-4 rounded-lg shadow-inner"
                 key={i}
               >
                 <span>
