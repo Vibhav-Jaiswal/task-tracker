@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SiTicktick } from "react-icons/si";
 import { TiDeleteOutline } from "react-icons/ti";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const App = () => {
   const [toggleButtonColor, setTtoggleButtonColor] = useState(false);
@@ -11,13 +12,16 @@ const App = () => {
     incomplete: true,
     completed: false,
   });
+  const [idx, setIdx] = useState(1);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const task = {
-      task : newTask,
+      id: `task-${idx}`,
+      task: newTask,
       taskAddDate: new Date().toLocaleDateString(),
     };
+    setIdx(idx + 1);
     const updatedTaskList = [...taskList, task];
     setTaskList(updatedTaskList);
     localStorage.setItem("list", JSON.stringify(updatedTaskList));
@@ -31,7 +35,7 @@ const App = () => {
 
   const handleCompleted = (idx) => {
     const newCompletedTask = {
-      task:taskList[idx],
+      task: taskList[idx],
       taskCompletedDate: new Date().toLocaleDateString(),
     };
     const savedCompletedList =
@@ -48,6 +52,16 @@ const App = () => {
     );
     localStorage.setItem("completedList", JSON.stringify(newCompletedList));
     setCompletedList(newCompletedList);
+  };
+
+  const handleDragEnd = (e) => {
+    if (!e.destination) return;
+    const updatedTasksList = [...taskList];
+    const [selectedTask] = updatedTasksList.splice(e.source.index, 1);
+    updatedTasksList.splice(e.destination.index, 0, selectedTask);
+
+    setTaskList(updatedTasksList);
+    localStorage.setItem("list", JSON.stringify(updatedTasksList));
   };
 
   useEffect(() => {
@@ -112,29 +126,54 @@ const App = () => {
           </button>
         </div>
         <div>
-          {taskList.length > 0 &&
-            screen.incomplete &&
-            taskList.map((item, i) => (
-              <div
-                className="flex justify-between bg-gray-500 p-4 items-center mb-4"
-                key={i}
-              >
-                <span>
-                  <p className="text-white text-lg pb-2">{item.task}</p>
-                  <p className="text-white text-sm ">{item.taskAddDate}</p>
-                </span>
-                <span className="flex flex-col sm:flex-row gap-4 items-center">
-                  <TiDeleteOutline
-                    className="text-red-500 w-8 h-8 hover:opacity-85 cursor-pointer"
-                    onClick={() => handleDelete(i)}
-                  />
-                  <SiTicktick
-                    className="text-green-500 w-6 h-6 hover:opacity-85 cursor-pointer"
-                    onClick={() => handleCompleted(i)}
-                  />
-                </span>
-              </div>
-            ))}
+          {screen.incomplete && (
+            <DragDropContext onDragEnd={handleDragEnd}>
+              {taskList.length > 0 && (
+                <Droppable droppableId="task-list">
+                  {(provided) => (
+                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                      {taskList.map((item, i) => (
+                        <Draggable
+                          key={item.id}
+                          draggableId={item.id}
+                          index={i}
+                        >
+                          {(provided) => (
+                            <div
+                              className="flex justify-between bg-gray-500 p-4 items-center mb-4"
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                            >
+                              <span>
+                                <p className="text-white text-lg pb-2">
+                                  {item.task}
+                                </p>
+                                <p className="text-white text-sm ">
+                                  {item.taskAddDate}
+                                </p>
+                              </span>
+                              <span className="flex flex-col sm:flex-row gap-4 items-center">
+                                <TiDeleteOutline
+                                  className="text-red-500 w-8 h-8 hover:opacity-85 cursor-pointer"
+                                  onClick={() => handleDelete(i)}
+                                />
+                                <SiTicktick
+                                  className="text-green-500 w-6 h-6 hover:opacity-85 cursor-pointer"
+                                  onClick={() => handleCompleted(i)}
+                                />
+                              </span>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              )}
+            </DragDropContext>
+          )}
           {completedList.length > 0 &&
             screen.completed &&
             completedList.map((item, i) => (
