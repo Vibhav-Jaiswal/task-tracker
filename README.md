@@ -6,7 +6,7 @@
 
 ## 1.Clone the Repository:
 
-     git clone https://github.com/example/task-tracker.git
+     git clone https://github.com/Vibhav-Jaiswal/task-tracker.git
 
 ## 2.Navigate to the Project Directory:
      cd task-tracker
